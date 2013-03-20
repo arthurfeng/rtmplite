@@ -271,9 +271,9 @@ class Protocol(object):
     def protocolMessage(self, msg):
         if msg.type == Message.ACK: # respond to ACK requests
             self.writeWinSize0 = struct.unpack('>L', msg.data)[0]
-#            response = Message()
-#            response.type, response.data = msg.type, msg.data
-#            yield self.writeMessage(response)
+            #response = Message()
+            #response.type, response.data = msg.type, msg.data
+            #yield self.writeMessage(response)
         elif msg.type == Message.CHUNK_SIZE:
             self.readChunkSize = struct.unpack('>L', msg.data)[0]
             if _debug: print "set read chunk size to %d" % self.readChunkSize
@@ -509,8 +509,8 @@ class Protocol(object):
     def write(self):
         '''Writes messages to stream'''
         while True:
-#            while self.writeQueue.empty(): (yield multitask.sleep(0.01))
-#            message = self.writeQueue.get() # TODO this should be used using multitask.Queue and remove previous wait.
+            #while self.writeQueue.empty(): (yield multitask.sleep(0.01))
+            #message = self.writeQueue.get() # TODO this should be used using multitask.Queue and remove previous wait.
             message = yield self.writeQueue.get() # TODO this should be used using multitask.Queue and remove previous wait.
             if _debug: print 'Protocol.write msg=', message
             if message is None: 
@@ -708,9 +708,9 @@ class FLV(object):
         
     def write(self, message):
         '''Write a message to the file, assuming it was opened for writing or appending.'''
-#        if message.type == Message.VIDEO:
-#            self.videostarted = True
-#        elif not hasattr(self, "videostarted"): return
+        #if message.type == Message.VIDEO:
+        #self.videostarted = True
+        #elif not hasattr(self, "videostarted"): return
         if message.type == Message.AUDIO or message.type == Message.VIDEO:
             length, ts = message.size, message.time
             #if _debug: print 'FLV.write()', message.type, ts
@@ -1000,7 +1000,7 @@ class App(object):
         elif mode in ('record', 'append'):
             path = getfilename(path, name, root)
             return FLV().open(path, mode)
-#        elif stream.mode == 'live': FLV().delete(path) # TODO: this is commented out to avoid accidental delete
+        #elif stream.mode == 'live': FLV().delete(path) # TODO: this is commented out to avoid accidental delete
         return None
 
 class Wirecast(App):
@@ -1107,9 +1107,9 @@ class FlashServer(object):
                         win_ack.time, win_ack.type, win_ack.data = client.relativeTime, Message.WIN_ACK_SIZE, struct.pack('>L', client.writeWinSize)
                         yield client.writeMessage(win_ack)
                         
-#                        set_peer_bw = Message()
-#                        set_peer_bw.time, set_peer_bw.type, set_peer_bw.data = client.relativeTime, Message.SET_PEER_BW, struct.pack('>LB', client.writeWinSize, 1)
-#                        client.writeMessage(set_peer_bw)
+                        #set_peer_bw = Message()
+                        #set_peer_bw.time, set_peer_bw.type, set_peer_bw.data = client.relativeTime, Message.SET_PEER_BW, struct.pack('>LB', client.writeWinSize, 1)
+                        #client.writeMessage(set_peer_bw)
                         
                         try: 
                             result = inst.onConnect(client, *args)
@@ -1290,22 +1290,22 @@ class FlashServer(object):
             m0.time, m0.type, m0.data = stream.client.relativeTime, Message.CHUNK_SIZE, struct.pack('>L', stream.client.writeChunkSize)
             yield stream.client.writeMessage(m0)
             
-#            m1 = Message() # UserControl/StreamIsRecorded
-#            m1.time, m1.type, m1.data = stream.client.relativeTime, Message.USER_CONTROL, struct.pack('>HI', 4, stream.id)
-#            yield stream.client.writeMessage(m1)
+            #m1 = Message() # UserControl/StreamIsRecorded
+            #m1.time, m1.type, m1.data = stream.client.relativeTime, Message.USER_CONTROL, struct.pack('>HI', 4, stream.id)
+            #yield stream.client.writeMessage(m1)
             
             m2 = Message() # UserControl/StreamBegin
             m2.time, m2.type, m2.data = stream.client.relativeTime, Message.USER_CONTROL, struct.pack('>HI', 0, stream.id)
             yield stream.client.writeMessage(m2)
             
-#            response = Command(name='onStatus', id=cmd.id, args=[amf.Object(level='status',code='NetStream.Play.Reset', description=stream.name, details=None)])
-#            yield stream.send(response)
+            #response = Command(name='onStatus', id=cmd.id, args=[amf.Object(level='status',code='NetStream.Play.Reset', description=stream.name, details=None)])
+            #yield stream.send(response)
             
             response = Command(name='onStatus', id=cmd.id, tm=stream.client.relativeTime, args=[amf.Object(level='status',code='NetStream.Play.Start', description=stream.name, details=None)])
             yield stream.send(response)
             
-#            response = Command(name='onStatus', id=cmd.id, tm=stream.client.relativeTime, args=[amf.Object(level='status',code='NetStream.Play.PublishNotify', description=stream.name, details=None)])
-#            yield stream.send(response)
+            #response = Command(name='onStatus', id=cmd.id, tm=stream.client.relativeTime, args=[amf.Object(level='status',code='NetStream.Play.PublishNotify', description=stream.name, details=None)])
+            #yield stream.send(response)
             
             if task is not None: multitask.add(task)
         except ValueError, E: # some error occurred. inform the app.
