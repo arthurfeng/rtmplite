@@ -86,10 +86,10 @@ class SockStream(object):
                 if len(self.buffer) >= count: # do have enough data in buffer
                     data, self.buffer = self.buffer[:count], self.buffer[count:]
                     raise StopIteration(data)
-                if _debug: print 'socket.read[%d] calling recv()'%(count,)
+                #if _debug: print 'socket.read[%d] calling recv()'%(count,)
                 data = (yield multitask.recv(self.sock, 4096)) # read more from socket
                 if not data: raise ConnectionClosed
-                if _debug: print 'socket.read[%d] %r'%(len(data), truncate(data))
+                #if _debug: print 'socket.read[%d] %r'%(len(data), truncate(data))
                 self.bytesRead += len(data)
                 self.buffer += data
         except StopIteration: raise
@@ -453,8 +453,8 @@ class Protocol(object):
                 if len(data) == header.size:
                     if channel in self.incompletePackets:
                         del self.incompletePackets[channel]
-                        if _debug:
-                            print 'aggregated %r bytes message: readChunkSize(%r) x %r'%(len(data), self.readChunkSize, len(data) / self.readChunkSize)
+                        #if _debug:
+                        #   print 'aggregated %r bytes message: readChunkSize(%r) x %r'%(len(data), self.readChunkSize, len(data) / self.readChunkSize)
                 else:
                     data, self.incompletePackets[channel] = data[:header.size], data[header.size:]
                 
@@ -464,7 +464,7 @@ class Protocol(object):
                 if hdr.type == Message.AGGREGATE:
                     ''' see http://code.google.com/p/red5/source/browse/java/server/trunk/src/org/red5/server/net/rtmp/event/Aggregate.java / getParts()
                     '''
-                    if _debug: print 'Protocol.parseMessages aggregated msg=', msg 
+                    #if _debug: print 'Protocol.parseMessages aggregated msg=', msg 
                     aggdata = data;
                     while len(aggdata) > 0:
                         '''
@@ -498,7 +498,7 @@ class Protocol(object):
 
     def parseMessage(self, msg):
         try:            
-            if _debug: print 'Protocol.parseMessage msg=', msg            
+            #if _debug: print 'Protocol.parseMessage msg=', msg            
             if msg.header.channel == Protocol.PROTOCOL_CHANNEL_ID:
                 yield self.protocolMessage(msg)
             else: 
@@ -1225,7 +1225,7 @@ class FlashServer(object):
         try:
             if message.type == Message.RPC or message.type == Message.RPC3:
                 cmd = Command.fromMessage(message)
-                if _debug: print 'streamhandler received cmd=', cmd
+                #if _debug: print 'streamhandler received cmd=', cmd
                 if cmd.name == 'publish':
                     yield self.publishhandler(stream, cmd)
                 elif cmd.name == 'play':
